@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - Freelancer Expense Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="logo.jpg" alt="No Image" width="50" height="50" class="rounded-circle"> Freelancer Expense Tracker
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="add-income.html">Add Income</a></li>
+                    <li class="nav-item"><a class="nav-link" href="add-expense.html">Add Expense</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html" onclick="logout()">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5 pt-5">
+        <h2>Welcome, <span id="username"></span>!</h2>
+        <p>Track your income and expenses.</p>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card text-white bg-success mb-3">
+                    <div class="card-header">Total Income</div>
+                    <div class="card-body">
+                        <h5 class="card-title" id="totalIncome">$0</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card text-white bg-danger mb-3">
+                    <div class="card-header">Total Expenses</div>
+                    <div class="card-body">
+                        <h5 class="card-title" id="totalExpenses">$0</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h3>Recent Transactions</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Type</th>
+                </tr>
+            </thead>
+            <tbody id="transactionTable">
+                <!-- Transactions will be loaded here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Assuming the user's ID is stored in a cookie or session
+        const userId = "USER_ID";  // Replace with your actual logic for fetching user ID
+        
+        async function loadDashboard() {
+            try {
+                // Fetch user data
+                const user = await fetch(`/users/${userId}`).then(res => res.json());
+                document.getElementById('username').textContent = user.username;
+
+                // Fetch incomes and expenses
+                const incomes = await fetch(`/incomes/${userId}`).then(res => res.json());
+                const expenses = await fetch(`/expenses/${userId}`).then(res => res.json());
+
+                // Calculate total income and expenses
+                const totalIncome = incomes.reduce((acc, income) => acc + income.amount, 0);
+                const totalExpenses = expenses.reduce((acc, expense) => acc + expense.amount, 0);
+
+                // Update UI
+                document.getElementById('totalIncome').textContent = `$${totalIncome.toFixed(2)}`;
+                document.getElementById('totalExpenses').textContent = `$${totalExpenses.toFixed(2)}`;
+
+                // Populate transactions table
+                const transactionTable = document.getElementById('transactionTable');
+                [...incomes, ...expenses].forEach(transaction => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${new Date(transaction.date).toLocaleDateString()}</td>
+                        <td>${transaction.category}</td>
+                        <td>$${transaction.amount.toFixed(2)}</td>
+                        <td>${transaction.type}</td>
+                    `;
+                    transactionTable.appendChild(row);
+                });
+            } catch (error) {
+                console.error("Error loading dashboard data", error);
+            }
+        }
+
+        function logout() {
+            // Clear session or cookie (not implemented here)
+            window.location.href = '/login.html';  // Redirect to login page
+        }
+
+        // Load dashboard data on page load
+        window.onload = loadDashboard;
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

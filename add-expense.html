@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Expense - Freelancer Expense Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="logo.jpg" alt="No Image" width="50" height="50" class="rounded-circle"> Freelancer Expense Tracker
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="user_dashboard.html">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="add-income.html">Add Income</a></li>
+                    <li class="nav-item"><a class="nav-link" href="add-expense.html">Add Expense</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html" onclick="logout()">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5 pt-5">
+        <h2>Add Expense</h2>
+        <form id="expenseForm">
+            <div class="mb-3">
+                <label for="category" class="form-label">Category</label>
+                <input type="text" class="form-control" id="category" required>
+            </div>
+            <div class="mb-3">
+                <label for="amount" class="form-label">Amount</label>
+                <input type="number" class="form-control" id="amount" required>
+            </div>
+            <div class="mb-3">
+                <label for="date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="date" required>
+            </div>
+            <button type="submit" class="btn btn-danger">Add Expense</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('expenseForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const userId = "USER_ID";  // Replace with actual logic to get user ID
+
+            const category = document.getElementById('category').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            const date = document.getElementById('date').value;
+
+            try {
+                const response = await fetch('/add_expense', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, category, amount, date })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert('Expense added successfully!');
+                    window.location.href = '/user_dashboard.html';
+                } else {
+                    alert('Error adding expense.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+
+        function logout() {
+            // Handle logout functionality
+            window.location.href = '/login.html';  // Redirect to login page
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
